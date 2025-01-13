@@ -1,34 +1,104 @@
 const form = document.getElementById("dataForm");
 const tableBody = document.querySelector("#dataTable tbody");
-const state = document.getElementById("state");
-const city = document.querySelector("#city select");
-//static data
-const arr = ["pratham", "patel", "p@xyz.com", 21, "2001-01-01", "male", ["book reading", "problem solving"], "gujarat", "surat"];
-// city filter data 
+let userDataBase = [];
 const stateCityMap = {
     "gujarat": ["ahmedabad", "surat", "bharuch", "navsari"],
     "panjab": ["Mohali", "Ludhiana", "Amritsar"]
 }
+const state = document.getElementById("state");
+const city = document.querySelector("#city select");
 
-const firstrow = document.createElement("tr");
+// one static data
+userDataBase.push({
+    "fname": "pratham",
+    "lname": "patel",
+    "email": "p@xyx.copm",
+    "age": 21,
+    "DOB": "2001-01-01",
+    "gender": "Male",
+    "hobbies": ["p", "a"],
+    "state": "Gujarat",
+    "city": "Surat"
+}
+);
 
-firstrow.innerHTML = `
-            <td>${arr[0]}</td>
-            <td>${arr[1]}</td>
-            <td>${arr[2]}</td>
-            <td>${arr[3]}</td>
-            <td>${arr[4]}</td>
-            <td>${arr[5]}</td>
-            <td>${arr[6]}</td>
-            <td>${arr[7]}</td>
-            <td>${arr[8]}</td>
-            <td>
+addDataIntable({ DB: userDataBase, index: 0 });
+
+
+form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    //add form data to DB
+    addFormDataInDB(userDataBase);
+    //add DB data to table
+    let lastIndex = userDataBase.length - 1;
+    addDataIntable({DB:userDataBase,index:lastIndex});
+})
+
+
+
+tableBody.addEventListener("click" , (event) => {
+    if(event.target.classList.contains("delete")){
+
+        const row = event.target.closest("tr");
+        console.log(`row index ${row.rowIndex}`);
+        
+        tableBody.removeChild(row);
+        form.reset();
+    }
+})
+
+
+
+
+
+
+function deleteDataFromDB(DB,index){
+    DB.splice(index,1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function addFormDataInDB(DB) {
+    const formData = new FormData(form);
+    userData = {}
+    for (const [key, value] of formData.entries()) {
+        userData[`${key}`] = value;
+    }
+    DB.push(userData);
+    console.log(DB.length - 1)
+}
+
+
+function addDataIntable({ DB, index }) {
+    let userData = DB[index];
+    console.log(userData);
+    const firstrow = document.createElement("tr");
+    tableRowDataSteing = "";
+    let userDataKeys = Object.keys(userData);
+
+    for (let i of userDataKeys) {
+        tableRowDataSteing += `<td>${userData[i]}</td>`;
+    }
+    tableRowDataSteing += `<td>
                 <button class="edit" value="edit">edit</button>
                 <button class="delete" value="delete">delete</button>
-            </td>
-            `;
+            </td>`;
+    firstrow.innerHTML = tableRowDataSteing;
+    tableBody.appendChild(firstrow);
+}
 
-tableBody.appendChild(firstrow);
 
 // filter event 
 state.addEventListener("change", () => {
@@ -48,94 +118,17 @@ state.addEventListener("change", () => {
 
 })
 
-// validation part
-
-function formValid(email, age) {
-
-    let toggle = true
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (emailPattern.test(email) == false) {
-        document.getElementById("emailvalidation").innerHTML = "plz enter the vaild email";
-        console.log("print not heloo 1");
-        toggle = false
-    }
-    if ((age < 1 && age > 100)) {
-        document.getElementById("agevalidation").innerHTML = "plz enter age 0 to 100";
-        console.log("print not heloo 2");
-        toggle = false
-    }
-    if (state == "") {
-        document.getElementById("statevalidation").innerHTML = "plz enter age 0 to 100";
-        console.log("print not heloo 3");
-        toggle = false
-    }
-    const genderSelected = document.querySelector('input[name="gender"]:checked');
-    if (!genderSelected) {
-        // errorMessage.textContent = "Please select a gender."
-        console.log("dwqwfwfdsadfs");
-        toggle = false
-    }
-
-
-    return toggle
-}
-
-//form submition event 
-form.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const fname = document.getElementById("fname").value;
-    const lname = document.getElementById("lname").value;
-    const email = document.getElementById("email").value;
-    const age = document.getElementById("age").value;
-    const DOB = document.getElementById("DOB").value;
-    const gender = document.querySelector('input[name="gender"]:checked').value;
-    const hobbies = Array
-        .from(document.querySelectorAll('input[type="checkbox"]'))
-        .filter((checkbox) => checkbox.checked)
-        .map((checkbox) => checkbox.value);
-
-    const state = document.getElementById("state").value;
-    console.log(state)
-    const city = document.getElementById("city").value;
-
-    console.log(typeof state)
-    const isValid = formValid(email, age);
-
-    if (isValid == true) {
-        const newRow = document.createElement("tr");
-
-        newRow.innerHTML = `
-            <td>${fname}</td>
-            <td>${lname}</td>
-            <td>${email}</td>
-            <td>${age}</td>
-            <td>${DOB}</td>
-            <td>${gender}</td>
-            <td>${hobbies}</td>
-            <td>${state}</td>
-            <td>${city}</td>
-            <td>
-                <button class="edit" value="edit">edit</button>
-                <button class="delete" value="delete">delete</button>
-            </td>
-            `;
-
-        tableBody.appendChild(newRow);
-        form.reset();
-    }
-});
 
 // edit and delete option
 tableBody.addEventListener("click", (event) => {
-    if (event.target.classList.contains("delete")) {
+    // if (event.target.classList.contains("delete")) {
 
-        const row = event.target.closest("tr");
-        tableBody.removeChild(row);
-        form.reset();
-    }
+    //     const row = event.target.closest("tr");
+    //     tableBody.removeChild(row);
+    //     form.reset();
+    // }
 
-    else if (event.target.classList.contains("edit")) {
+    if (event.target.classList.contains("edit")) {
 
         const row = event.target.closest("tr");
         const ceil = row.querySelectorAll("td");
